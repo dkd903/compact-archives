@@ -3,7 +3,7 @@ Contributors: smub, noumaan, deb255
 Tags: posts, archive, archives
 Requires at least: 3.0
 Tested up to: 4.8
-Stable tag: trunk
+Stable tag: 3.0.5
 
 Displays a monthly archive of posts in a more compact form than the usual long list.
 

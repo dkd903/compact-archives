@@ -3,7 +3,7 @@
 Plugin Name: WPBeginner's Compact Archives
 Plugin URI: http://www.wpbeginner.com
 Description: Displays a compact monthly archive instead of the default long list. Either display it as a block suitable for the body of a page or in a form compact enough for a sidebar.
-Version: 3.0.4
+Version: 3.0.5
 Author: WPBeginner
 Author URI: http://www.wpbeginner.com
 */
