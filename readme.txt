@@ -122,6 +122,8 @@ Compact Archives also honours whatever kind of permalink pattern you have set.
 1. Compact archives displayed in block layout
 
 == Changelog ==
+= 3.0.5 =
+* WordPress 4.8 compatibility
 = 3.0.4 =
 * WordPress 4.3 compat
 = 3.0.3 =
