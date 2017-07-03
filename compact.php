@@ -305,4 +305,36 @@ function wpb_caw_load_languages() {
 
 add_action( 'plugins_loaded', 'wpb_caw_load_languages' );
 
+/**
+ * Number of Secondary feed items to show
+ */
+function am_dashboard_secondary_items() {
+	return 6;
+}
+add_filter( 'dashboard_secondary_items', 'am_dashboard_secondary_items' );
+
+/**
+ * Update the planet feed to add the WPB feed
+ */
+function am_dashboard_rss( $feed, $url ) {
+	// Return early if not on the right page.
+	global $pagenow;
+	if ( 'admin-ajax.php' !== $pagenow ) {
+		return;
+	}
+
+	// Return early if not on the right feed.
+	if ( strpos( $url, 'planet.wordpress.org' ) === false ) {
+		return;
+	}
+
+	// Only move forward if this action hasn't been done already.
+	if ( ! $GLOBALS['wpb_feed_append'] ) {
+		$GLOBALS['wpb_feed_append'] = true;
+		$urls = array( 'http://www.wpbeginner.com/feed/', $url );
+		$feed->set_feed_url( $urls );
+	}
+}
+add_action( 'wp_feed_options', 'am_dashboard_rss', 10, 2 );
+
 ?>
