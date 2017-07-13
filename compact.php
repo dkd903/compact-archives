@@ -64,24 +64,24 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 function compact_archive( $style='initial', $before='<li>', $after='</li>' ) {
  	$result = false;
 	// if the Plugin Output Cache is installed we can cheat...
-	if (defined('POC_CACHE_4')) {
-		$key = 'c_a'.$style.$before.$after;
+	if ( defined( 'POC_CACHE_4' ) ) {
+		$key = 'c_a' . $style . $before . $after;
 		poc_cache_timer_start();
-		$result = poc_cache_fetch($key);
-		if ($result) $cache_time = sprintf('<!-- Compact Archive took %.3f milliseconds from the cache -->', 1000 * poc_cache_timer_start());
+		$result = poc_cache_fetch( $key );
+		if ( $result ) $cache_time = sprintf( '<!-- Compact Archive took %.3f milliseconds from the cache -->', 1000 * poc_cache_timer_start() );
 	}
 	// ... otherwise we do it the hard way
-	if (false === $result) {
-		$result = utf8_encode(get_compact_archive($style, $before, $after));
-		if (defined('POC_CACHE_4')) {
-			poc_cache_store($key, $result);
-			$cache_time = sprintf('<!-- Compact Archive took %.3f milliseconds -->', 1000 * poc_cache_timer_start());
+	if ( false === $result ) {
+		$result = utf8_encode( get_compact_archive( $style, $before, $after ) );
+		if ( defined( 'POC_CACHE_4' ) ) {
+			poc_cache_store( $key, $result );
+			$cache_time = sprintf( '<!-- Compact Archive took %.3f milliseconds -->', 1000 * poc_cache_timer_start() );
 		}
 	}
 
 	echo $result;
 
-if (defined('POC_CACHE_4')) echo  $cache_time;
+	if ( defined( 'POC_CACHE_4' ) ) echo  $cache_time;
 
 }
 
@@ -91,48 +91,50 @@ if (defined('POC_CACHE_4')) echo  $cache_time;
 
 function get_compact_archive( $style='initial', $before='<li>', $after='</li>' ) {
 	global $wpdb, $wp_version;
-	setlocale(LC_ALL,WPLANG); // set localization language
-	$below21 = version_compare($wp_version, '2.1','<');
-	// WP 2.1 changed the way post_status and post_type fields work
-	if ($below21) {
-		$now = current_time('mysql');
-		$results = $wpdb->get_results("SELECT DISTINCT YEAR(post_date) AS year, MONTH(post_date) AS month FROM " . $wpdb->posts . " WHERE post_date <'" . $now . "' AND post_status='publish' AND post_password='' ORDER BY year DESC, month DESC");
-	} else {
-		$results = $wpdb->get_results("SELECT DISTINCT YEAR(post_date) AS year, MONTH(post_date) AS month FROM " . $wpdb->posts . " WHERE post_type='post' AND post_status='publish' AND post_password='' ORDER BY year DESC, month DESC");
+	if ( defined( 'WPLANG' ) ) {
+		setlocale( LC_ALL, WPLANG ); // set localization language
 	}
-	if (!$results) {
-		return $before.__('Archive is empty').$after;
+	$below21 = version_compare( $wp_version, '2.1', '<' );
+	// WP 2.1 changed the way post_status and post_type fields work
+	if ( $below21 ) {
+		$now = current_time( 'mysql' );
+		$results = $wpdb->get_results( "SELECT DISTINCT YEAR(post_date) AS year, MONTH(post_date) AS month FROM " . $wpdb->posts . " WHERE post_date <'" . $now . "' AND post_status='publish' AND post_password='' ORDER BY year DESC, month DESC" );
+	} else {
+		$results = $wpdb->get_results( "SELECT DISTINCT YEAR(post_date) AS year, MONTH(post_date) AS month FROM " . $wpdb->posts . " WHERE post_type='post' AND post_status='publish' AND post_password='' ORDER BY year DESC, month DESC" );
+	}
+	if ( !$results ) {
+		return $before . __( 'Archive is empty' ) . $after;
 	}
 	$dates = array();
-	foreach ($results as $result) {
+	foreach ( $results as $result ) {
 		$dates[$result->year][$result->month] = 1;
 	}
-	unset($results);
+	unset( $results );
 	$result = '';
-	foreach ($dates as $year => $months){
-		$result .= $before.'<strong><a href="'.get_year_link($year).'">'.$year.'</a>: </strong> ';
-		for ( $month = 1; $month <= 12; $month += 1) {
-			$month_has_posts = (isset($months[$month]));
-			$dummydate = strtotime("$month/01/2001");
+	foreach ( $dates as $year => $months ) {
+		$result .= $before . '<strong><a href="' . get_year_link( $year ) . '">' . $year . '</a>: </strong> ';
+		for ( $month = 1; $month <= 12; $month += 1 ) {
+			$month_has_posts = ( isset( $months[$month] ) );
+			$dummydate = strtotime( "$month/01/2001" );
 			// get the month name; strftime() localizes
-			$month_name = strftime("%B", $dummydate);
-			switch ($style) {
+			$month_name = strftime( "%B", $dummydate );
+			switch ( $style ) {
 			case 'initial':
 				$month_abbrev = $month_name[0]; // the inital of the month
 				break;
 			case 'block':
-				$month_abbrev = strftime("%b", $dummydate); // get the short month name; strftime() localizes
+				$month_abbrev = strftime( "%b", $dummydate ); // get the short month name; strftime() localizes
 				break;
 			case 'numeric':
-				$month_abbrev = strftime("%m", $dummydate); // get the month number, e.g., '04'
+				$month_abbrev = strftime( "%m", $dummydate ); // get the month number, e.g., '04'
 				break;
 			default:
 				$month_abbrev = $month_name[0]; // the inital of the month
 			}
-			if ($month_has_posts) {
-				$result .= '<a href="'.get_month_link($year, $month).'" title="'.$month_name.' '.$year.'">'.$month_abbrev.'</a> ';
+			if ( $month_has_posts ) {
+				$result .= '<a href="' . get_month_link( $year, $month ) . '" title="' . $month_name . ' ' . $year . '">' . $month_abbrev . '</a> ';
 			} else {
-				$result .= '<span class="emptymonth">'.$month_abbrev.'</span> ';
+				$result .= '<span class="emptymonth">' . $month_abbrev . '</span> ';
 			}
 		}
 		$result .= $after."\n";
@@ -142,23 +144,24 @@ function get_compact_archive( $style='initial', $before='<li>', $after='</li>' )
 
 // Compact Archive Shortcode
 
-function compact_archives_shortcode($atts) {
-extract( shortcode_atts( array(
-		'style' => 'initial',
-		'before' => '<li>',
-		'after' => '</li>'
-	), $atts ) );
+function compact_archives_shortcode( $atts ) {
+	extract( shortcode_atts( array(
+			'style' => 'initial',
+			'before' => '<li>',
+			'after' => '</li>'
+		), $atts ) );
+
 	if ($before == "<li>")	:
 		$wrap = "<ul>";
 	endif;
 
-	if ($after == "</li>") :
-$wrap_end = "</ul>";
-endif;
+	if ( $after == "</li>" ) :
+		$wrap_end = "</ul>";
+	endif;
 
-$string = $wrap . get_compact_archive($style, $before, $after) . $wrap_end;
+	$string = $wrap . get_compact_archive( $style, $before, $after ) . $wrap_end;
 
-return $string;
+	return $string;
 
 }
 
@@ -206,10 +209,7 @@ class WPBeginner_CAW_Widget extends WP_Widget {
 		echo $before_widget;
 		if ( $title ) echo $before_title . $title . $after_title; ?>
 		<ul class="compact-archives"<?php echo $text_style; ?>>
-
-				<?php compact_archive( $style = $widget_style ); ?>
-
-
+			<?php compact_archive( $style = $widget_style ); ?>
 		</ul>
 		<?php echo $after_widget;
 	}
@@ -336,5 +336,3 @@ function am_dashboard_rss( $feed, $url ) {
 	}
 }
 add_action( 'wp_feed_options', 'am_dashboard_rss', 10, 2 );
-
-?>
